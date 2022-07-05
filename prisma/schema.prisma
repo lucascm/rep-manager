@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Billing {
+
+  id       String   @id @default(uuid())
+  date     DateTime
+  status   StatusBilling @default(OPENED)
+  idPerson Person   @relation(fields: [personId], references: [id])
+  details  Json // { products: [ { id, qty, price, total }], totals: { total, discount, qty, endValue } } 
+
+  personId String
+}
+
+model Product {
+  id              String  @id @default(uuid())
+  alternativeCode String?
+  name            String
+  description     String
+  unit            String
+  price           Decimal
+  stock           Int
+}
+
+model Person {
+
+  id        String     @id @default(uuid())
+  name      String
+  document  String // cpf or cnpj or another document
+  pathPhoto String?
+  type      PersonType @default(REPRESENTANT)
+  details   Json? // { stock: [ { id, description, price, total }], billings: [id1, id2, id3]}
+  status    Boolean
+  billing   Billing[]
+
+
+}
+
+enum StatusBilling {
+	OPENED
+	PROCESSING
+	ABORTED
+	CLOSED
+}
+
+enum PersonType {
+  REPRESENTANT
+  MANAGER
+  CLIENT
+}
