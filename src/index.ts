@@ -43,4 +43,8 @@ prisma.person.findUnique({
 
     })
     .catch(err => console.log('falhou', err))
+    .finally(async () => {
+         console.log('finalizou o comando');
+         await prisma.$disconnect();
+     })
 
